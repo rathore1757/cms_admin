@@ -1,0 +1,23 @@
+.admin-main-product{
+    display: flex !important;
+    border: 0 !important;
+    justify-content: space-between;
+    align-items: top;
+    align-items: flex-start;
+}
+.admin-main-product-accordion{
+    width: 100%;
+    margin-right: 50px !important;
+    padding: 8px 0;
+    box-shadow: none;
+    border: 1px solid #e2e2e2;
+    box-shadow: none !important;
+}
+.admin-view-edit{
+    background-color: rgb(33, 54, 124);
+    padding: 15px 15px;
+    border-radius: 5px;
+    color: #fff;
+    width: 150px;
+    text-align: center;
+}
