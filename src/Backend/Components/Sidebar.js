@@ -179,6 +179,12 @@ function Sidebar({ isSidebarVisible, handleToggleSidebar }) {
             <span className="app-menu__label">BestSeller & Fashion Trend</span>
           </NavLink>
         </li>
+        <li>
+          <NavLink to="/pages" className="app-menu__item" href="docs.html">
+            <i className="app-menu__icon fa-solid fa-business-time"></i>
+            <span className="app-menu__label">Add/Manage Pages</span>
+          </NavLink>
+        </li>
         {/* <li>
           <NavLink
             to="/Setting_admin"

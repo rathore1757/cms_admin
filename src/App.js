@@ -26,6 +26,8 @@ import Orders from "./Backend/Pages/Orders/Orders";
 import OrderDetails from "./Backend/Pages/orderDetails/OrderDetails";
 import ViewProduct from "./Backend/Pages/Products/ViewProduct";
 import ViewVariants from "./Backend/Pages/Products/ViewVariants";
+import BlogPages from "./Backend/Pages/BlogPages/BlogPages";
+import AddPages from "./Backend/Pages/AddPages/AddPages";
 
 function App() {
   const [isUserLogin, setIsUserLogin] = useState(false);
@@ -113,6 +115,8 @@ function App() {
             <Route path="/subadmins" element={<SubAdmins />} />
             <Route path="orders" element={<Orders />} />
             <Route path="orders/:orderid" element={<OrderDetails />} />
+            <Route path="/pages" element={<BlogPages />} />
+            <Route path="/addpages" element={<AddPages />} />
             <Route
               path="/eyewear_collection"
               element={<BeautifulEyewearCollection />}
