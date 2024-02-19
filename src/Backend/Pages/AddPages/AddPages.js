@@ -1,12 +1,17 @@
 import axios from "axios";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Modal, Form, Button } from "react-bootstrap";
 import { toast } from "react-toastify";
 import CircularLoader from "../../Components/CircularLoader/CircularLoader";
 import Swal from "sweetalert2";
+
 const AddPages = () => {
   const [isContentAvailable, setIsContentAvailable] = useState(false);
+  const [citiesList, setCitiesList] = useState(null);
   const [title, setTitle] = useState("");
+  const onHide = () => setModalShow(false);
+  const onShowModal = () => setModalShow(true);
+  const [modalShow, setModalShow] = useState(false);
   const [slug, setSlug] = useState("");
   const [image, setImage] = useState(null);
   const [content, setContent] = useState("");
@@ -14,9 +19,110 @@ const AddPages = () => {
   const [metaTags, setMetaTags] = useState("");
   const [metaDesc, setMetaDesc] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const handleSubmitContent = () => {
-    setIsLoading(true);
+  useEffect(() => {
+    getCitiesList();
+  }, []);
+  const handleOpenSaveModal = () => {
+    if (!title || title == null || title == undefined || title.trim() == "") {
+      toast.error("Title is required");
+    } else if (
+      !description ||
+      description == null ||
+      description == undefined ||
+      description.trim() == ""
+    ) {
+      toast.error("Description is required");
+    } else if (
+      !content ||
+      content == null ||
+      content == undefined ||
+      content.trim() == ""
+    ) {
+      toast.error("Content is required");
+    } else if (
+      !metaTags ||
+      metaTags == null ||
+      metaTags == undefined ||
+      metaTags.trim() == ""
+    ) {
+      toast.error("Meta Tags are required");
+    } else if (
+      !metaDesc ||
+      metaDesc == null ||
+      metaDesc == undefined ||
+      metaDesc.trim() == ""
+    ) {
+      toast.error("Meta Description is required");
+    } else {
+      onShowModal();
+    }
+  };
+  const getCitiesList = () => {
+    let config = {
+      method: "get",
+      maxBodyLength: Infinity,
+      url: "http://localhost:2000/api/user/blog/feth_city",
+      headers: {},
+    };
 
+    axios
+      .request(config)
+      .then((response) => {
+        console.log(response?.data?.data);
+        setCitiesList(response?.data?.data);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
+  const generateAutoForCities = () => {
+    let config1 = {
+      method: "post",
+      maxBodyLength: Infinity,
+      url: "http://localhost:2000/api/user/blog/generate_data_for_cities",
+      headers: {},
+    };
+
+    axios
+      .request(config1)
+      .then((response) => {
+        toast.success("Started Auto generation");
+      })
+      .catch((error) => {
+        toast.success("Data saved");
+        toast.warning("Auto generation of data for other city failed");
+      });
+  };
+  const saveKeywordsAndSubmit = () => {
+    let data = {
+      title: title,
+    };
+
+    let config = {
+      method: "post",
+      maxBodyLength: Infinity,
+      url: "http://localhost:2000/api/user/blog/save_keywords",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      data: data,
+    };
+
+    axios
+      .request(config)
+      .then((response) => {
+        console.log(JSON.stringify(response.data));
+        generateAutoForCities();
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
+  const handleSubmitContent = (generateAuto) => {
+    if (generateAuto == true) {
+      saveKeywordsAndSubmit();
+    }
+    setIsLoading(true);
     let data = {
       title: title,
       slug: slug,
@@ -39,22 +145,7 @@ const AddPages = () => {
     axios
       .request(config)
       .then((response) => {
-        let config1 = {
-          method: "post",
-          maxBodyLength: Infinity,
-          url: "http://localhost:2000/api/user/blog/generate_data_for_cities",
-          headers: {},
-        };
-
-        axios
-          .request(config1)
-          .then((response) => {
-            toast.success("Data saved successfully");
-          })
-          .catch((error) => {
-            toast.success("Data saved");
-            toast.warning("Auto generation of data for other city failed");
-          });
+        toast.success("Data Saved Successfully");
         setIsLoading(false);
       })
       .catch((error) => {
@@ -184,7 +275,10 @@ const AddPages = () => {
                 onChange={(e) => setMetaDesc(e.target.value)}
               />
             </Form.Group>
-            <Button onClick={handleSubmitContent}>
+            <Button
+              // onClick={handleSubmitContent}
+              onClick={handleOpenSaveModal}
+            >
               {isLoading == true ? (
                 <>
                   <CircularLoader size={20} />
@@ -198,6 +292,31 @@ const AddPages = () => {
           <></>
         )}
       </Form>
+      <Modal
+        show={modalShow}
+        onHide={onHide}
+        size="lg"
+        aria-labelledby="contained-modal-title-vcenter"
+        centered
+      >
+        <Modal.Header closeButton>
+          <Modal.Title id="contained-modal-title-vcenter">
+            Generate Content Automatically
+          </Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <h4>Do you want to generate content for the following keywords?</h4>
+          <ul style={{ height: "200px", overflow: "scroll" }}>
+            {citiesList &&
+              citiesList.length > 0 &&
+              citiesList.map((val) => <li>{`${title} in ${val?.city}`}</li>)}
+          </ul>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button onClick={() => handleSubmitContent(false)}>No</Button>
+          <Button onClick={() => handleSubmitContent(true)}>Yes</Button>
+        </Modal.Footer>
+      </Modal>
     </div>
   );
 };
